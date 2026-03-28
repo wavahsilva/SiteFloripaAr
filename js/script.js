@@ -4,6 +4,12 @@ const navClose = document.getElementById('nav-close');
 const navLinks = document.querySelectorAll('.nav__link');
 const header = document.getElementById('header');
 const contactForm = document.getElementById('contact-form');
+const whatsappLinks = document.querySelectorAll('[data-whatsapp-link]');
+const contactPhones = document.querySelectorAll('.contact-phone');
+
+let whatsappNumber = '5548999999999';
+let whatsappNumberFormatted = '(48) 99999-9999';
+let whatsappDefaultMessage = 'Olá! Gostaria de solicitar um orçamento com a Floripa AR.';
 
 if (navToggle) {
     navToggle.addEventListener('click', () => {
@@ -52,6 +58,53 @@ function scrollActive() {
 
 window.addEventListener('scroll', scrollActive);
 
+function buildWhatsappUrl(customMessage) {
+    const message = customMessage || whatsappDefaultMessage;
+    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+}
+
+function updateWhatsappLinks() {
+    const url = buildWhatsappUrl();
+    whatsappLinks.forEach(link => {
+        link.href = url;
+    });
+}
+
+function updateContactPhones() {
+    contactPhones.forEach(phone => {
+        phone.textContent = whatsappNumberFormatted;
+    });
+}
+
+async function loadConfig() {
+    try {
+        const response = await fetch('config.json', { cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error('Não foi possível carregar o config.json');
+        }
+
+        const data = await response.json();
+        if (data?.contact?.phone) {
+            whatsappNumber = data.contact.phone;
+        }
+        if (data?.contact?.phoneFormatted) {
+            whatsappNumberFormatted = data.contact.phoneFormatted;
+        }
+        if (data?.contact?.whatsappDefaultMessage) {
+            whatsappDefaultMessage = data.contact.whatsappDefaultMessage;
+        }
+
+        updateWhatsappLinks();
+        updateContactPhones();
+    } catch (error) {
+        console.error('Erro ao carregar config.json:', error);
+        updateWhatsappLinks();
+        updateContactPhones();
+    }
+}
+
+loadConfig();
+
 if (contactForm) {
     contactForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -61,9 +114,8 @@ if (contactForm) {
         const phone = document.getElementById('phone').value;
         const message = document.getElementById('message').value;
 
-        const whatsappNumber = '5548999999999';
         const whatsappMessage = `Olá! Meu nome é ${name}.\n\nEmail: ${email}\nTelefone: ${phone}\n\nMensagem: ${message}`;
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+        const whatsappUrl = buildWhatsappUrl(whatsappMessage);
 
         window.open(whatsappUrl, '_blank');
 
