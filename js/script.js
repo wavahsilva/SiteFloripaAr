@@ -7,8 +7,8 @@ const contactForm = document.getElementById('contact-form');
 const whatsappLinks = document.querySelectorAll('[data-whatsapp-link]');
 const contactPhones = document.querySelectorAll('.contact-phone');
 
-let whatsappNumber = '5548999999999';
-let whatsappNumberFormatted = '(48) 99999-9999';
+let whatsappNumber = '5548999156552';
+let whatsappNumberFormatted = '(48) 99915-6552';
 let whatsappDefaultMessage = 'Olá! Gostaria de solicitar um orçamento com a Floripa AR.';
 
 if (navToggle) {
@@ -102,6 +102,9 @@ async function loadConfig() {
         updateContactPhones();
     }
 }
+
+updateWhatsappLinks();
+updateContactPhones();
 
 loadConfig();
 

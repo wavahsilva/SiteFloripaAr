@@ -77,12 +77,12 @@ body {
 }
 
 .button-primary {
-    background-color: var(--white-color);
+    background-color: var(--primary-color);
     color: var(--white-color);
 }
 
 .button-primary:hover {
-    background-color: var(--secondary-color);
+    background-color: var(--accent-color);
     transform: translateY(-2px);
     box-shadow: var(--shadow-hover);
 }
@@ -175,7 +175,7 @@ body {
     display: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: var(--text-color);
+    color: var(--white-color);
 }
 
 .home {
@@ -670,8 +670,8 @@ body {
         right: -100%;
         width: 75%;
         height: 100vh;
-        background-color: var(--white-color);
-        box-shadow: -2px 0 20px rgba(0, 0, 0, 0.1);
+        background-color: #026aa7;
+        box-shadow: -2px 0 20px rgba(0, 0, 0, 0.2);
         padding: 6rem 2rem 2rem;
         transition: var(--transition);
     }
