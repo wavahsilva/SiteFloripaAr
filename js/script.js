@@ -6,10 +6,19 @@ const header = document.getElementById('header');
 const contactForm = document.getElementById('contact-form');
 const whatsappLinks = document.querySelectorAll('[data-whatsapp-link]');
 const contactPhones = document.querySelectorAll('.contact-phone');
+const heroSlider = document.getElementById('hero-slider');
+const contactEmails = document.querySelectorAll('.contact-email');
+const socialLinks = document.querySelectorAll('[data-social-link]');
 
 let whatsappNumber = '5548999156552';
 let whatsappNumberFormatted = '(48) 99915-6552';
 let whatsappDefaultMessage = 'Olá! Gostaria de solicitar um orçamento com a Floripa AR.';
+let contactEmail = 'contato@floripaar.com.br';
+let contactMailSubject = 'Contato via site Floripa AR';
+let sliderImages = [];
+let sliderIndex = 0;
+let sliderIntervalId;
+let emailJsConfig = null;
 
 if (navToggle) {
     navToggle.addEventListener('click', () => {
@@ -76,6 +85,49 @@ function updateContactPhones() {
     });
 }
 
+function updateContactEmails() {
+    contactEmails.forEach(emailEl => {
+        emailEl.textContent = contactEmail;
+    });
+}
+
+function updateSocialLinks(socialConfig = {}) {
+    socialLinks.forEach(link => {
+        const network = link.dataset.socialLink;
+        if (network && socialConfig[network]) {
+            link.href = socialConfig[network];
+        }
+    });
+}
+
+function showNextHeroImage() {
+    if (!heroSlider || sliderImages.length <= 1) return;
+
+    heroSlider.classList.add('is-fading');
+
+    setTimeout(() => {
+        sliderIndex = (sliderIndex + 1) % sliderImages.length;
+        heroSlider.src = sliderImages[sliderIndex];
+        heroSlider.classList.remove('is-fading');
+    }, 300);
+}
+
+function initHeroSlider() {
+    if (!heroSlider) return;
+
+    const imagesAttr = heroSlider.dataset.sliderImages;
+    if (!imagesAttr) return;
+
+    sliderImages = imagesAttr.split(',').map(img => img.trim()).filter(Boolean);
+    if (sliderImages.length <= 1) return;
+
+    heroSlider.src = sliderImages[0];
+    sliderIndex = 0;
+
+    sliderIntervalId = setInterval(showNextHeroImage, 5000);
+    setTimeout(showNextHeroImage, 1000);
+}
+
 async function loadConfig() {
     try {
         const response = await fetch('config.json', { cache: 'no-store' });
@@ -90,26 +142,46 @@ async function loadConfig() {
         if (data?.contact?.phoneFormatted) {
             whatsappNumberFormatted = data.contact.phoneFormatted;
         }
+        if (data?.contact?.email) {
+            contactEmail = data.contact.email;
+        }
+        if (data?.contact?.mailSubject) {
+            contactMailSubject = data.contact.mailSubject;
+        }
         if (data?.contact?.whatsappDefaultMessage) {
             whatsappDefaultMessage = data.contact.whatsappDefaultMessage;
         }
 
+        if (data?.emailjs) {
+            emailJsConfig = data.emailjs;
+            if (emailjs && emailjs.init && emailJsConfig.publicKey) {
+                emailjs.init(emailJsConfig.publicKey);
+            }
+        }
+
         updateWhatsappLinks();
         updateContactPhones();
+        updateContactEmails();
+        updateSocialLinks(data?.socials);
     } catch (error) {
         console.error('Erro ao carregar config.json:', error);
         updateWhatsappLinks();
         updateContactPhones();
+        updateContactEmails();
+        updateSocialLinks();
     }
 }
 
 updateWhatsappLinks();
 updateContactPhones();
+updateContactEmails();
+updateSocialLinks();
+initHeroSlider();
 
 loadConfig();
 
 if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const name = document.getElementById('name').value;
@@ -117,14 +189,34 @@ if (contactForm) {
         const phone = document.getElementById('phone').value;
         const message = document.getElementById('message').value;
 
-        const whatsappMessage = `Olá! Meu nome é ${name}.\n\nEmail: ${email}\nTelefone: ${phone}\n\nMensagem: ${message}`;
-        const whatsappUrl = buildWhatsappUrl(whatsappMessage);
+        const feedbackEl = document.getElementById('contact-feedback');
+        const formData = {
+            from_name: name,
+            reply_to: email,
+            phone,
+            message,
+            to_email: contactEmail,
+            mail_subject: contactMailSubject
+        };
 
-        window.open(whatsappUrl, '_blank');
+        if (!emailJsConfig?.serviceId || !emailJsConfig?.templateId || !emailJsConfig?.publicKey) {
+            feedbackEl.textContent = 'Configuração de email incompleta. Atualize o config.json.';
+            feedbackEl.classList.add('is-error');
+            return;
+        }
 
-        contactForm.reset();
+        feedbackEl.textContent = 'Enviando mensagem...';
+        feedbackEl.classList.remove('is-error');
 
-        alert('Redirecionando para o WhatsApp...');
+        try {
+            await emailjs.send(emailJsConfig.serviceId, emailJsConfig.templateId, formData);
+            feedbackEl.textContent = 'Mensagem enviada com sucesso! Entraremos em contato em breve.';
+            contactForm.reset();
+        } catch (err) {
+            console.error('Erro ao enviar email:', err);
+            feedbackEl.textContent = 'Não foi possível enviar sua mensagem. Tente novamente mais tarde.';
+            feedbackEl.classList.add('is-error');
+        }
     });
 }
 

@@ -2,6 +2,19 @@
   "contact": {
     "phone": "5548999156552",
     "phoneFormatted": "(48) 99915-6552",
-    "whatsappDefaultMessage": "Olá! Gostaria de solicitar um orçamento com a Floripa AR."
+    "whatsappDefaultMessage": "Olá! Gostaria de solicitar um orçamento com a Floripa AR.",
+    "email": "contato@floripaar.com.br",
+    "mailSubject": "Contato via site Floripa AR"
+  },
+  "socials": {
+    "instagram": "https://www.instagram.com/flo_ripar?igsh=MnB6ZnB6bnkyOGJu",
+    "facebook": "https://www.facebook.com/share/1G99rvvMNG/",
+    "youtube": "https://youtube.com/floripaar",
+    "linkedin": "https://www.linkedin.com/company/floripa-ar"
+  },
+  "emailjs": {
+    "publicKey": "SUA_PUBLIC_KEY",
+    "serviceId": "SEU_SERVICE_ID",
+    "templateId": "SEU_TEMPLATE_ID"
   }
 }

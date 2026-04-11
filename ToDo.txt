@@ -1,0 +1,7 @@
+- atualizar texto sobre deixar igual a google ou melhorado
+- ver se as redes sociais estão     OK 
+- n apage inicio fazer um carrossel pasando pelo menos 3 fotos   OK
+- avaliação, tentar puxar varias avaliações
+ - atualizar email, e configurar junto com  json
+ - testar se email está funcionando
+ - ele comprou o dominio ver como fazer o email deles com o dominio

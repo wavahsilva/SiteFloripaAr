@@ -101,7 +101,25 @@ Edite o texto da seção "Sobre Nós" (linhas 86-98) com a história real da emp
 
 ### 6. Avaliações de Clientes
 
-Substitua as avaliações de exemplo (linhas 168-220) por avaliações reais dos seus clientes.
+### 7. Configuração do Formulário de Email (EmailJS)
+
+Para enviar mensagens diretamente pelo site sem sair da página, usamos o [EmailJS](https://www.emailjs.com/). Basta criar uma conta gratuita e preencher no `config.json` os campos abaixo:
+
+```json
+"emailjs": {
+  "publicKey": "SUA_PUBLIC_KEY",
+  "serviceId": "SEU_SERVICE_ID",
+  "templateId": "SEU_TEMPLATE_ID"
+}
+```
+
+**Passos:**
+1. Crie uma conta e configure um **Email Service** (Gmail, Outlook, etc.) → copie o `service_id`.
+2. Crie um **Email Template** com os campos `from_name`, `reply_to`, `phone`, `message`, `to_email` e `mail_subject` → copie o `template_id`.
+3. Vá em **Account → API Keys** para pegar a `publicKey`.
+4. Coloque os três valores no `config.json`.
+
+Pronto! O formulário exibirá mensagens de sucesso/erro sem redirecionar o usuário.
 
 ## 🌐 Como Usar
 
