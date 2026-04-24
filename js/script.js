@@ -14,11 +14,9 @@ let whatsappNumber = '5548999156552';
 let whatsappNumberFormatted = '(48) 99915-6552';
 let whatsappDefaultMessage = 'Olá! Gostaria de solicitar um orçamento com a Floripa AR.';
 let contactEmail = 'contato@floripaar.com.br';
-let contactMailSubject = 'Contato via site Floripa AR';
 let sliderImages = [];
 let sliderIndex = 0;
 let sliderIntervalId;
-let emailJsConfig = null;
 
 if (navToggle) {
     navToggle.addEventListener('click', () => {
@@ -145,18 +143,8 @@ async function loadConfig() {
         if (data?.contact?.email) {
             contactEmail = data.contact.email;
         }
-        if (data?.contact?.mailSubject) {
-            contactMailSubject = data.contact.mailSubject;
-        }
         if (data?.contact?.whatsappDefaultMessage) {
             whatsappDefaultMessage = data.contact.whatsappDefaultMessage;
-        }
-
-        if (data?.emailjs) {
-            emailJsConfig = data.emailjs;
-            if (emailjs && emailjs.init && emailJsConfig.publicKey) {
-                emailjs.init(emailJsConfig.publicKey);
-            }
         }
 
         updateWhatsappLinks();
@@ -181,42 +169,19 @@ initHeroSlider();
 loadConfig();
 
 if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
+    contactForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const phone = document.getElementById('phone').value;
-        const message = document.getElementById('message').value;
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const message = document.getElementById('message').value.trim();
 
-        const feedbackEl = document.getElementById('contact-feedback');
-        const formData = {
-            from_name: name,
-            reply_to: email,
-            phone,
-            message,
-            to_email: contactEmail,
-            mail_subject: contactMailSubject
-        };
+        const customMessage = `Olá! Meu nome é ${name}.\nEmail: ${email}\nTelefone: ${phone}\n\nMensagem:\n${message}`;
+        const whatsappUrl = buildWhatsappUrl(customMessage);
 
-        if (!emailJsConfig?.serviceId || !emailJsConfig?.templateId || !emailJsConfig?.publicKey) {
-            feedbackEl.textContent = 'Configuração de email incompleta. Atualize o config.json.';
-            feedbackEl.classList.add('is-error');
-            return;
-        }
-
-        feedbackEl.textContent = 'Enviando mensagem...';
-        feedbackEl.classList.remove('is-error');
-
-        try {
-            await emailjs.send(emailJsConfig.serviceId, emailJsConfig.templateId, formData);
-            feedbackEl.textContent = 'Mensagem enviada com sucesso! Entraremos em contato em breve.';
-            contactForm.reset();
-        } catch (err) {
-            console.error('Erro ao enviar email:', err);
-            feedbackEl.textContent = 'Não foi possível enviar sua mensagem. Tente novamente mais tarde.';
-            feedbackEl.classList.add('is-error');
-        }
+        window.open(whatsappUrl, '_blank');
+        contactForm.reset();
     });
 }
 
@@ -244,17 +209,24 @@ animatedElements.forEach(el => {
 
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            const headerHeight = header.offsetHeight;
-            const targetPosition = target.offsetTop - headerHeight;
-            
-            window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-            });
+        if (this.dataset.socialLink !== undefined || this.dataset.whatsappLink !== undefined) {
+            return;
         }
+
+        const targetSelector = this.getAttribute('href');
+        const target = document.querySelector(targetSelector);
+        if (!target) {
+            return;
+        }
+
+        e.preventDefault();
+        const headerHeight = header.offsetHeight;
+        const targetPosition = target.offsetTop - headerHeight;
+        
+        window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+        });
     });
 });
 

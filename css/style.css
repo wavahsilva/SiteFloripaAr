@@ -506,17 +506,6 @@ body {
     min-height: 120px;
 }
 
-.form__feedback {
-    font-size: 0.95rem;
-    margin-top: 0.5rem;
-    min-height: 1.25rem;
-    color: var(--primary-color);
-}
-
-.form__feedback.is-error {
-    color: #d93025;
-}
-
 .map__container {
     margin-top: 3rem;
 }
